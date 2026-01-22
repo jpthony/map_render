@@ -1,6 +1,8 @@
 # Map Renderer 🗺️
 
-Serveur Node.js pour générer des images de cartes avec des polylignes. Deux modes de rendu disponibles.
+Serveur Node.js pour générer des images de cartes avec des polylignes. 
+Deux modes de rendu disponibles : **tracé simple** ou **tracé sur carte OpenStreetMap**.
+
 
 ## Installation
 
