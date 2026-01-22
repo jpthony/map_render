@@ -7,6 +7,14 @@ Serveur Node.js pour générer des images de cartes avec des polylignes. Deux mo
 ### Prérequis
 - Docker & Docker Compose (recommandé)
 - Ou Node.js 20+ + npm
+- Git
+
+### Cloner le projet
+
+```bash
+git clone https://github.com/jpthony/map_render.git
+cd map_render
+```
 
 ### Avec Docker (Recommandé)
 
