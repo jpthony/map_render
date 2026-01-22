@@ -119,11 +119,26 @@ map-renderer/
 
 ---
 
-**Exemple avec curl** :
+**Exemples avec curl** :
 
 ```bash
+#simple
 curl -X POST http://localhost:3000/render_map \
   -H "Content-Type: application/json" \
   -d '{"points":[[43.70842,7.29267],[43.70821,7.29271]],"width":900,"height":900}' \
   > map.png
+
+#complet
+curl -X POST http://localhost:3000/render_map \
+  -H "Content-Type: application/json" \
+  -d '{
+    "points": [[43.70715,7.2924],[43.707,7.29229]],
+    "width": 450,
+    "height": 450,
+    "stroke": 4,
+    "zoom": 13,
+    "attribution": true,
+    "customAttribution": "My map",
+    "darkMode": false
+  }' > map.png
 ```
