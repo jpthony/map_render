@@ -12,7 +12,7 @@ app.post("/render", (req, res) => {
   //const { points, width = 900, height = 450, stroke = 4 } = req.body;
   let { points, width = 900, height = 900, stroke = 4 } = req.body;
 
-  // ✅ FIX n8n: points arrive souvent en string
+  // ✅ FIX : lorsque les points arrivent en string
   if (typeof points === "string") {
     try {
       points = JSON.parse(points);
