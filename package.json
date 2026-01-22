@@ -1,0 +1,10 @@
+{
+  "name": "map-renderer",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "canvas": "^2.11.2",
+    "express": "^4.19.2",
+    "puppeteer": "^22.0.0"
+  }
+}

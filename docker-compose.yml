@@ -1,0 +1,12 @@
+services:
+  map-renderer:
+    build: ./
+    container_name: map-renderer
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    shm_size: '1gb'
+    environment:
+      - NODE_ENV=production
+    #networks:
+    #  - proxy

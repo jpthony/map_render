@@ -1,0 +1,16 @@
+node_modules/
+*.log
+.DS_Store
+.env
+.env.local
+dist/
+build/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.dockerignore
+
+#  Ignore development files
+index_osm.js
