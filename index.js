@@ -132,16 +132,16 @@ app.post("/render_map", async (req, res) => {
     var map = L.map('map', {
       zoomControl: false,
       attributionControl: false
-    }).setView([${centerLat}, ${centerLng}], ${defaultZoom});
-    
-    L.tileLayer('${tileLayer}', {
+    });
+
+    var tileLayerObj = L.tileLayer('${tileLayer}', {
       attribution: '',
       maxZoom: 19,
       subdomains: '${darkMode ? 'abcd' : 'abc'}'
     }).addTo(map);
-    
+
     ${attribution ? `L.control.attribution({ position: 'bottomright', prefix: '' }).addAttribution('${customAttribution}').addTo(map);` : ''}
-    
+
     var polyline = L.polyline([${polylineCoords}], {
       color: '#005eff',
       weight: 4,
@@ -149,7 +149,7 @@ app.post("/render_map", async (req, res) => {
       smoothFactor: 0.5,
       dashArray: null
     }).addTo(map);
-    
+
     // Départ (vert) et arrivée (rouge)
     L.circleMarker([${points[0][0]}, ${points[0][1]}], {
       radius: 6,
@@ -159,7 +159,7 @@ app.post("/render_map", async (req, res) => {
       opacity: 1,
       fillOpacity: 0.8
     }).addTo(map);
-    
+
     L.circleMarker([${points[points.length-1][0]}, ${points[points.length-1][1]}], {
       radius: 6,
       fillColor: 'red',
@@ -168,23 +168,15 @@ app.post("/render_map", async (req, res) => {
       opacity: 1,
       fillOpacity: 0.8
     }).addTo(map);
-    
+
+    // Enregistrer l'écouteur de tuiles AVANT fitBounds (évite la race condition avec animate:false)
+    tileLayerObj.once('load', function() {
+      window.__tilesLoaded = true;
+    });
+    setTimeout(function() { window.__tilesLoaded = true; }, 4000);
+
     // Fit bounds (sans animation pour application immédiate)
     map.fitBounds(polyline.getBounds(), { padding: [50, 50], animate: false });
-    
-    // Signaler quand les tiles sont chargées après fitBounds
-    map.once('moveend', function() {
-      // Attendre que toutes les tuiles du nouveau zoom soient chargées
-      var tileLayer = map.eachLayer(function(layer) {
-        if (layer._url) {
-          layer.once('load', function() {
-            window.__tilesLoaded = true;
-          });
-        }
-      });
-      // Fallback si les tiles sont déjà en cache
-      setTimeout(function() { window.__tilesLoaded = true; }, 2000);
-    });
   </script>
 </body>
 </html>`;
