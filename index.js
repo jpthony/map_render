@@ -183,9 +183,9 @@ app.post("/render_map", async (req, res) => {
     const page = await browser.newPage();
     await page.setExtraHTTPHeaders({ 'User-Agent': 'MapRendererBot/1.0 (map-renderer service)' });
     await page.setViewport({ width, height, deviceScaleFactor: 1 });
-    await page.setContent(html, { waitUntil: 'networkidle0' });
+    await page.setContent(html, { waitUntil: 'networkidle2' });
     
-    // Attendre que les tiles se chargent complètement
+    // Attendre que les tiles post-fitBounds se chargent
     await new Promise(resolve => setTimeout(resolve, 5000));
     
     const screenshot = await page.screenshot({ 
