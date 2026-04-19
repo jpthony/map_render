@@ -169,8 +169,22 @@ app.post("/render_map", async (req, res) => {
       fillOpacity: 0.8
     }).addTo(map);
     
-    // Fit bounds
-    map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
+    // Fit bounds (sans animation pour application immédiate)
+    map.fitBounds(polyline.getBounds(), { padding: [50, 50], animate: false });
+    
+    // Signaler quand les tiles sont chargées après fitBounds
+    map.once('moveend', function() {
+      // Attendre que toutes les tuiles du nouveau zoom soient chargées
+      var tileLayer = map.eachLayer(function(layer) {
+        if (layer._url) {
+          layer.once('load', function() {
+            window.__tilesLoaded = true;
+          });
+        }
+      });
+      // Fallback si les tiles sont déjà en cache
+      setTimeout(function() { window.__tilesLoaded = true; }, 2000);
+    });
   </script>
 </body>
 </html>`;
@@ -185,8 +199,10 @@ app.post("/render_map", async (req, res) => {
     await page.setViewport({ width, height, deviceScaleFactor: 1 });
     await page.setContent(html, { waitUntil: 'networkidle2' });
     
-    // Attendre que les tiles post-fitBounds se chargent
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    // Attendre que les tiles post-fitBounds soient chargées
+    await page.waitForFunction('window.__tilesLoaded === true', { timeout: 10000 }).catch(() => {});
+    // Petit délai supplémentaire pour le rendu final
+    await new Promise(resolve => setTimeout(resolve, 2000));
     
     const screenshot = await page.screenshot({ 
       type: 'png',
