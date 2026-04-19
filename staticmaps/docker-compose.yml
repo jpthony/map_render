@@ -1,0 +1,9 @@
+services:
+  map-renderer-static:
+    build: ./
+    container_name: map-renderer-static
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production

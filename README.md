@@ -1,105 +1,20 @@
-# Map Renderer 🗺️
+# map-renderer
 
-Serveur Node.js pour générer des images de cartes avec des polylignes. 
-Deux modes de rendu disponibles : **tracé simple** ou **tracé sur carte OpenStreetMap**.
+Microservice Node.js/Express qui génère une image PNG d'une carte avec un tracé GPS (polyline).  
+Deux implémentations disponibles selon les contraintes de déploiement.
 
+## Choisir une version
 
-## Installation
+| | [puppeteer/](puppeteer/) | [staticmaps/](staticmaps/) |
+|---|---|---|
+| Moteur | Puppeteer + Leaflet (Chrome headless) | staticmaps (canvas Node.js) |
+| Démarrage | ~3–5 s | < 100 ms |
+| RAM | ~300–500 MB | ~50 MB |
+| Image Docker | ~1 GB | ~200 MB |
+| Styles de carte | OSM, CartoDB dark | OSM, CartoDB (light/dark/voyager), Topo |
+| Rendu JS Leaflet | Oui | Non |
 
-### Prérequis
-- Docker & Docker Compose (recommandé)
-- Ou Node.js 20+ + npm
-- Git
-
-### Cloner le projet
-
-```bash
-git clone https://github.com/jpthony/map_render.git
-cd map_render
-```
-
-### Avec Docker (Recommandé)
-
-```bash
-# Démarrer le conteneur
-docker compose up --build
-
-# Le serveur sera disponible sur http://localhost:3000
-```
-
-### Avec npm
-
-```bash
-# Installer les dépendances
-npm install
-
-# Démarrer le serveur
-npm start
-# Ou : node index.js
-```
-
-## Routes disponibles
-
-### 1. `/render` - Rendu simple (canvas)
-Génère une image simple avec la polyligne tracée en bleu.
-
-**POST** avec JSON :
-```json
-{
-  "points": [[43.70842,7.29267], [43.70821,7.29271], [43.70812,7.29271]],
-  "width": 900,
-  "height": 900,
-  "stroke": 4
-}
-```
-
-**Réponse** : Image PNG
-
----
-
-### 2. `/render_map` - Rendu Leaflet/OSM
-Génère une carte interactive OSM avec Leaflet, screenshot en PNG. Affichage épuré sans boutons de zoom.
-
-**POST** avec JSON :
-```json
-{
-  "points": [[43.70842,7.29267], [43.70821,7.29271], [43.70812,7.29271]],
-  "width": 900,
-  "height": 900,
-  "zoom": 13,
-  "attribution": true,
-  "customAttribution": "Map data © OpenStreetMap",
-  "darkMode": false
-}
-```
-
-**Paramètres optionnels** :
-- `zoom` : niveau de zoom (défaut: 13)
-- `attribution` : afficher les crédits (défaut: true)
-- `customAttribution` : texte des crédits personnalisé (défaut: "Map data © OpenStreetMap")
-- `darkMode` : thème sombre (défaut: false)
-
-**Réponse** : Image PNG
-
----
-
-## Réinstaller / Rebuild
-
-Après modification du code :
-
-```bash
-# Nettoyer complètement
-docker compose down --volumes
-docker system prune -af --volumes
-
-# Relancer avec rebuild
-docker compose up --build --no-cache
-```
-
-Ou plus rapide :
-```bash
-docker compose up --build --no-cache
-```
+**→ Utilise `staticmaps/` par défaut**, sauf si tu as besoin d'un comportement Leaflet spécifique.
 
 ---
 
@@ -107,48 +22,80 @@ docker compose up --build --no-cache
 
 ```
 map-renderer/
-├── index.js           # Serveur Express
-├── package.json       # Dépendances
-├── Dockerfile         # Image Docker
-├── docker-compose.yml # Orchestration
-└── README.md          # Ce fichier
+├── puppeteer/          # Version Puppeteer + Leaflet
+│   ├── index.js
+│   ├── package.json
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   └── README.md
+├── staticmaps/         # Version staticmaps (sans navigateur)
+│   ├── index.js
+│   ├── package.json
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   └── README.md
+└── README.md
 ```
-
-## Dépendances
-
-- **express** : Serveur HTTP
-- **canvas** : Rendu 2D simple
-- **puppeteer** : Screenshot Leaflet/OSM
-
-## Notes
-
-- Les points doivent être au format `[latitude, longitude]`
-- La route `/render_map` nécessite Puppeteer + Chromium (plus lent)
-- La route `/render` est rapide et léère pour du rendu simple
-- Limit taille JSON : 5MB
 
 ---
 
-**Exemples avec curl** :
+## Démarrage rapide
+
+### Avec Docker
 
 ```bash
-#simple
-curl -X POST http://localhost:3000/render_map \
-  -H "Content-Type: application/json" \
-  -d '{"points":[[43.70842,7.29267],[43.70821,7.29271]],"width":900,"height":900}' \
-  > map.png
+# Version staticmaps (port 3001)
+cd staticmaps && docker compose up -d
 
-#complet
-curl -X POST http://localhost:3000/render_map \
+# Version puppeteer (port 3000)
+cd puppeteer && docker compose up -d
+```
+
+### Sans Docker (Node.js 20+ requis)
+
+```bash
+# Version staticmaps
+cd staticmaps
+npm install
+node index.js   # → http://localhost:3000
+
+# Version puppeteer
+cd puppeteer
+npm install
+node index.js   # → http://localhost:3000
+```
+
+> La version puppeteer télécharge Chromium automatiquement lors du `npm install` (~170 MB).
+
+---
+
+## API commune — `POST /render_map`
+
+Les deux versions partagent la même interface :
+
+| Paramètre | Type | Défaut | Description |
+|---|---|---|---|
+| `points` | `[[lat, lng], ...]` ou string JSON | — | **Requis.** Minimum 2 points |
+| `width` | number | `900` | Largeur en pixels |
+| `height` | number | `900` | Hauteur en pixels |
+| `stroke` | number | `4` | Épaisseur de la polyline |
+| `darkMode` | boolean | `false` | Thème sombre |
+
+Paramètres spécifiques → voir le README de chaque version.
+
+**Réponse :** image `image/png`
+
+---
+
+## Exemple cURL
+
+```bash
+curl -s -X POST http://localhost:3001/render_map \
   -H "Content-Type: application/json" \
   -d '{
-    "points": [[43.70715,7.2924],[43.707,7.29229]],
-    "width": 450,
-    "height": 450,
-    "stroke": 4,
-    "zoom": 13,
-    "attribution": true,
-    "customAttribution": "My map",
-    "darkMode": false
-  }' > map.png
+    "points": [[43.710, 7.262], [43.705, 7.270], [43.696, 7.275]],
+    "width": 900,
+    "height": 900,
+    "stroke": 4
+  }' --output trace.png
 ```

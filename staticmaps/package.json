@@ -1,0 +1,9 @@
+{
+  "name": "map-renderer-static",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "express": "^4.19.2",
+    "staticmaps": "^1.10.0"
+  }
+}
