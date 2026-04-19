@@ -137,7 +137,7 @@ app.post("/render_map", async (req, res) => {
     L.tileLayer('${tileLayer}', {
       attribution: '',
       maxZoom: 19,
-      subdomains: 'abcd'
+      subdomains: '${darkMode ? 'abcd' : 'abc'}'
     }).addTo(map);
     
     ${attribution ? `L.control.attribution({ position: 'bottomright', prefix: '' }).addAttribution('${customAttribution}').addTo(map);` : ''}
@@ -181,11 +181,12 @@ app.post("/render_map", async (req, res) => {
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     const page = await browser.newPage();
+    await page.setExtraHTTPHeaders({ 'User-Agent': 'MapRendererBot/1.0 (map-renderer service)' });
     await page.setViewport({ width, height, deviceScaleFactor: 1 });
-    await page.setContent(html, { waitUntil: 'networkidle2' });
+    await page.setContent(html, { waitUntil: 'networkidle0' });
     
-    // Attendre que les tiles se chargent
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    // Attendre que les tiles se chargent complètement
+    await new Promise(resolve => setTimeout(resolve, 5000));
     
     const screenshot = await page.screenshot({ 
       type: 'png',
