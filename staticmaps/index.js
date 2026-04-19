@@ -2,11 +2,15 @@ import express from "express";
 import StaticMaps from "staticmaps";
 
 const TILE_PROVIDERS = {
-  osm:        { url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",          subdomains: ["a", "b", "c"] },
-  dark:       { url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",  subdomains: ["a", "b", "c", "d"] },
-  light:      { url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png", subdomains: ["a", "b", "c", "d"] },
-  voyager:    { url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png", subdomains: ["a", "b", "c", "d"] },
-  topo:       { url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",            subdomains: ["a", "b", "c"] },
+  osm: { url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", subdomains: ["a", "b", "c"] },
+  dark: { url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png", subdomains: ["a", "b", "c", "d"] },
+  light: { url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png", subdomains: ["a", "b", "c", "d"] },
+  voyager: { url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png", subdomains: ["a", "b", "c", "d"] },
+  topo: { url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", subdomains: ["a", "b", "c"] },
+  humanitarian: { url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", subdomains: ["a", "b", "c"] },
+  wikimedia: { url: "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png", subdomains: [] },
+  esri_sat: { url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", subdomains: [] },
+  esri_street: { url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", subdomains: [] },
 };
 
 const app = express();

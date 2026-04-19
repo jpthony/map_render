@@ -50,6 +50,10 @@ docker compose up -d
 | `light` | CartoDB Positron (clair, épuré) |
 | `voyager` | CartoDB Voyager |
 | `topo` | OpenTopoMap (relief) |
+| `humanitarian` | OSM Humanitarian |
+| `wikimedia` | Wikimedia Maps |
+| `esri_sat` | Esri World Imagery (Satellite) |
+| `esri_street` | Esri World Imagery (relief) |
 
 **Réponse :** image `image/png`
 
